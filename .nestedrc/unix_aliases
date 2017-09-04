@@ -72,6 +72,23 @@ function fgm() {
     ffm $GitRoot $@
 }
 
+###Edit Found Git Matches
+function efgm() {
+    local Hits
+    Hits=$(fgm "$1")
+    if [ $? -ne 0 ]
+    then
+        return 1
+    fi
+    if [ $( echo $Hits | wc -w ) -ne 1 ]
+    then
+        _error_echo "Wrong number of hits: $Hits"
+        return 1
+    else
+        vim $Hits
+    fi
+}
+
 function _complete_for_fgm(){
     if [ -n $2 ] 
     then
@@ -91,23 +108,6 @@ function _complete_for_fgm(){
             COMPREPLY=($(fgm *${2}* | xargs -n1 basename))
         fi  
     fi  
-}
-
-###Edit Found Git Matches
-function efgm() {
-    local Hits
-    Hits=$(fgm "$1")
-    if [ $? -ne 0 ]
-    then
-        return 1
-    fi
-    if [ $( echo $Hits | wc -w ) -ne 1 ]
-    then
-        _error_echo "Wrong number of hits: $Hits"
-        return 1
-    else
-        vim $Hits
-    fi
 }
 complete -F _complete_for_fgm efgm
 
@@ -163,16 +163,6 @@ function jdiff(){
     #opendiff $TempFileA $TempFileB
 }
 
-###update MOTTO
-function motto(){
-    if [ $# -ne 0 ]
-    then
-        echo "$@" > $MottoState
-    fi
-    Motto=$(cat $MottoState)
-    PS1="\[${MottoColor}\]${Motto}\[${NormalColor}\]:${ShaPS1}"
-}
-
 ###Edit VIMRC
 alias evimrc='vim $HOME/.vimrc'
 
@@ -219,52 +209,14 @@ function cdate(){
     date "+%Y${Delim}%m${Delim}%d" | tr -d '\n' | pbcopy
 }
 
-###override CD 
-function cd(){
-    builtin cd "$@"
-    echo "1 $(pwd)" >> ${DirHeatMap}
-}
-
-function _crunch() {
-    awk '{map[$2]+=$1}END{for(dir in map)print map[dir] " " dir}'
-}
-
-###CLEAN HCD of missing files
-function clean_hcd() {
-    local TempMap
-    TempMap=/tmp/temp_$(basename $DirHeatMap)
-    cat $DirHeatMap | awk '{print "if [ -d "$2" ]; then echo "$1" "$2"; fi" }'| bash > $TempMap
-    cat $TempMap > $DirHeatMap
-    rm $TempMap
-}
-
-###Heat map CD
-function hcd(){
-    local SearchTerm
-    SearchTerm="$1"
-    local Count=1
-    local TargetDir
-    local TempMap
-    TempMap=/tmp/temp_$(basename $DirHeatMap)
-    cat $DirHeatMap | _crunch | sort -nk1 > $TempMap
-    cat $TempMap > $DirHeatMap
-    rm $TempMap
-    if [ $# -eq 0 ]
+###update MOTTO
+function motto(){
+    if [ $# -ne 0 ]
     then
-        cat ${DirHeatMap}
-        return 0
+        echo "$@" > $MottoState
     fi
-    if [ $# -gt 1 ]
-    then
-        Count=$2
-    fi
-    TargetDir=$(cat ${DirHeatMap} | grep "$SearchTerm" | awk '{print $2}' | tail -$Count | head -1)
-    if [ -z $TargetDir ]
-    then
-        _error_echo "No Matches for $@"
-        return 1
-    fi
-    cd $TargetDir
+    Motto=$(cat $MottoState)
+    PS1="\[${MottoColor}\]${Motto}\[${NormalColor}\]:${ShaPS1}"
 }
 
 ###Create MottoState if it does not exist already
