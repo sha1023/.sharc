@@ -17,7 +17,10 @@ source $HOME/.sharc/.sharc
 
 ## Usage:
 This package is sort of self documenting the `sharc` command prints all comments that are prefixed by "###" and all aliases/functions not prefixed by "\_".
+
 I've included some of my favorite aliases, but the package is really just meant to allow meant to allow for easy modification and addition of aliases. There are also a few cute tools for editing particular commands on the fly:
+
+0) `sharc`: Summarize sHARC -- print available commands.
 1) `esharc`: Edit SHARC -- scans the packages for the argument you feed it and then open the relevant alias file. With no arguments it opens all the alias files. (Make sure to know how to quit out of vim before using this.)
 2) `grsharc`: GRep SHARC -- greps all alias files. It should understand all grep flags you think to feed it.
 
