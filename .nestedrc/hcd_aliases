@@ -2,6 +2,9 @@
 
 ### ### HEAT MAP CD UTILITIES ### ###
 
+export DirHeatMap
+DirHeatMap="${StateDir}/dir_heat_map"
+
 ###override CD 
 function cd(){
     builtin cd "$@"

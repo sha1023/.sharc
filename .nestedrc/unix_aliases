@@ -34,8 +34,6 @@ ShaPS1='\[\e[0;33m\]\[\e[0;34m\]\W\[\e[0m\]\$'
 export MottoState
 MottoState="${StateDir}/motto"
 export Motto
-export DirHeatMap
-DirHeatMap="${StateDir}/dir_heat_map"
 
 ###cd TMP
 alias tmp='cd /tmp'
