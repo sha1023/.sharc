@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+### ### MAC SPECIFIC UTILITIES ### ###
+
+if [ "$ShaOS" != "darwin" ]
+then
+    _error_echo "Not sourcing mac aliases since $ShaOS != darwin."
+    return 0
+fi
+
+###Copy Git Match
+function cgm() {
+    local Hits
+    Hits=$(fgfm "$1")
+    if [ $( echo $Hits | wc -w ) -ne 1 ]
+    then
+        _error_echo "Wrong number of hits: $Hits"
+        return 1
+    else
+        echo "$Hits" | tr -d '\n' | pbcopy
+    fi
+}
+complete -F _complete_for_fgm cgm
+
