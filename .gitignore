@@ -1,3 +1,6 @@
 #ignore all files with the extension .local
 *.local
+#ignore any open vim swp files
+*.swp
+#ignore state which is probably private
 .state/*

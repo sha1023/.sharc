@@ -16,6 +16,7 @@ source $HOME/.sharc/.sharc
 ---
 
 ## Usage:
+
 This package is sort of self documenting the `sharc` command prints all comments that are prefixed by "###" and all aliases/functions not prefixed by "\_".
 
 I've included some of my favorite aliases, but the package is really just meant to allow meant to allow for easy modification and addition of aliases. There are also a few cute tools for editing particular commands on the fly:
@@ -38,3 +39,7 @@ My favorite aliases included are:
 5) `efgm`: Edit Found Git Matches -- Edits the file in your git directory that matches the provided regex.
 6) `motto`: change MOTTO -- Prefixes your command line prompt with your motto.
 
+## Structure:
+
+There is a controller file `.sharc/.sharc` it sources all files found in `.sharc/.nestedrc` ensuring to do source the files in order of their depth in the directory tree. This is to ensure that aliases can be reused by deeper levels. If you would like to add another bash source file, simply add it to .nestedrc or one of its children directories.
+`.sharc/.state` contains all files important to the sharc state. E.g. your personal motto. if .state does not exist it is created when .sharc is sourced.
