@@ -41,5 +41,9 @@ My favorite aliases included are:
 
 ## Structure:
 
-There is a controller file `.sharc/.sharc` it sources all files found in `.sharc/.nestedrc` ensuring to do source the files in order of their depth in the directory tree. This is to ensure that aliases can be reused by deeper levels. If you would like to add another bash source file, simply add it to .nestedrc or one of its children directories.
-`.sharc/.state` contains all files important to the sharc state. E.g. your personal motto. if .state does not exist it is created when .sharc is sourced.
+There is a controller file `.sharc/.sharc` it sources all files found in `.sharc/.nestedrc` ensuring to source the files in order of their depth in the directory tree.
+This is to ensure that aliases can be reused by deeper levels.
+If you would like to add another bash source file, simply add it to .nestedrc or one of its children directories.
+
+`.sharc/.state` contains all files important to the sharc state (E.g. your personal motto). 
+If .state does not exist it is created when .sharc is sourced.
