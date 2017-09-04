@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+
+### ### SHA RC ### ###
+
+echo "sourcing ${BASH_SOURCE[0]}"
+
+export SharcDir
+SharcDir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export SourceHierarchy
+if [ -z "$SourceHierarchy" ]
+then 
+    for Source in ${BASH_SOURCE[@]}
+    do
+        SourceHierarchy="$Source $SourceHierarchy"
+    done
+fi
+
+export AliasDir
+AliasDir="$SharcDir/.nestedrc"
+export StateDir
+StateDir="$SharcDir/.state"
+export MainRC
+if [ -z "$MainRC" ]
+then
+    MainRC=$(echo "$SourceHierarchy" | cut -d' ' -f 1) #~/.bashrc
+fi
+
+export ShaOS
+ShaOS=linux
+if [ $(echo $OSTYPE | grep "darwin.*" | wc -l) -eq 1 ]
+then
+    ShaOS=darwin
+fi
+
+###Set Normal Color
+export NormalColor
+NormalColor=$(tput sgr0)
+export AlertColor
+AlertColor=$(tput rev)
+
+function _error_echo() {
+    (>&2 echo -e "${AlertColor}$@${NormalColor}")
+}
+
+function _unpack_nested_aliases() {
+    local AliasList
+    local NestedDirs
+    NestedDirs=$(find $AliasDir -type d)
+    for NestedDir in $NestedDirs
+    do
+        #odd looking so it stays system agnostic:
+        AliasList="$AliasList $(ls -laF "$NestedDir" | tail -n +2 | grep -v / | awk -v RootDir=$NestedDir/ '{print RootDir $NF}')"
+    done
+    echo "$AliasList" | sed 's/[^ ]*\.swp/ /g'
+}
+
+function _source_all() {
+    local RetVal
+    for SourceFile in $@
+    do
+        echo sourcing $SourceFile
+        source $SourceFile
+        RetVal=$?
+        if [ $RetVal -ne 0 ]
+        then
+            _error_echo "Error ($RetVal) sourcing $SourceFile"
+        fi
+    done
+}
+
+function _get_all_aliases() {
+    echo "${SourceHierarchy} $(_unpack_nested_aliases)" | sed 's/[^ ]*\.swp/ /g'
+}
+
+###SHARC cD into
+alias sharcd="cd $SharcDir"
+
+###SHARC State cd into
+alias sharcs='cd $StateDir'
+
+###Export SHARC tar file
+function xsharc() {
+    local BaseName
+    BaseName="$(basename "${SharcDir}")"
+    tar -cvf "/tmp/$BaseName.tar" -C ~ $BaseName
+    _error_echo -e "\nExporting ${SharcDir} to /tmp/$BaseName.tar\n"
+}
+
+###Edit SHARC
+function esharc() {
+    local SearchList
+    SearchList=$(_get_all_aliases)
+    if [ -z $1 ]
+    then
+        vim +:ls $SearchList
+    else 
+        local SearchTerm
+        SearchTerm="^function\s$1\|^alias\s$1\|^###\s*$1"
+        local SearchResults
+        SearchResults=$(grep -l $SearchTerm $SearchList)
+        if [ -n "$SearchResults" ]
+        then
+            vim +/$SearchTerm $SearchResults
+        else
+            _error_echo "No Results Found For $1"
+        fi
+    fi
+    source $MainRC
+}
+complete -A function -A alias esharc
+
+###GRep SHARC
+function grsharc() {
+    if [ $# -eq 0 ]
+    then
+        _error_echo Error. Need more arguments.
+    fi
+    grep $@ $(_get_all_aliases)
+}
+
+###Summarize sHARC
+function sharc() {
+    local SearchTerm
+    local SearchList
+    SearchTerm='^function\s[A-Za-z][^(]\+\|^alias\s[A-Za-z][^=]*\|^###.*$'
+    SearchList=$(_get_all_aliases)
+    grep -ho "$SearchTerm" $SearchList | sed 's/function/    /g' | sed 's/alias/    /g'
+}
+
+_source_all $(_unpack_nested_aliases)
+
