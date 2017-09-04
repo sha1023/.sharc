@@ -1,0 +1,275 @@
+#!/usr/bin/env bash
+
+### ### BASIC UTILITIES ### ###
+
+###Tell grep to highlight matches
+export GREP_OPTIONS='--color=auto'
+
+###set default editor to vim
+export EDITOR
+EDITOR=vim
+
+###History binds
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+bind '"\eOA": history-search-backward'
+bind '"\eOB": history-search-forward'
+
+###Set History Time Format:
+HISTTIMEFORMAT="${AlertColor} %Y-%m-%d %H:%M #${NormalColor}  "
+###increase history size 
+HISTSIZE=10000
+HISTFILESIZE=$HISTSIZE
+
+# Terminal colors
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+export TERM="xterm-color"
+
+#My minimalistic version:
+export ShaPS1
+ShaPS1='\[\e[0;33m\]\[\e[0;34m\]\W\[\e[0m\]\$'
+
+#define motto state
+export MottoState
+MottoState="${StateDir}/motto"
+export Motto
+export DirHeatMap
+DirHeatMap="${StateDir}/dir_heat_map"
+
+###cd TMP
+alias tmp='cd /tmp'
+
+#Trick for color label in this case (your personal motto):
+if [ -z $MottoColor ]
+then
+    export MottoColor=$(tput setaf 1) # Red
+fi
+
+function _find_git_root(){
+    git rev-parse --show-toplevel
+    return $?
+}
+
+###Find Filename Matches
+function ffm() {
+    if [ $# -lt 2 ]
+    then
+        _error_echo "Not enough arguments to ffm"
+        return 1
+    fi
+    find $1 -name "$2" -type f
+}
+
+###Find Git file Matches
+function fgm() {
+    local GitRoot
+    GitRoot=$(_find_git_root)
+    if [ $? -ne 0 ]
+    then 
+        return 1
+    fi
+    ffm $GitRoot $@
+}
+
+function _complete_for_fgm(){
+    if [ -n $2 ] 
+    then
+        fgm ${2} > /dev/null
+        if [ $? -ne 0 ]
+        then
+            _error_echo "PROBLEM WITH fgm"
+            return 1
+        fi
+        COMPREPLY=($(fgm ${2} | xargs -n1 basename))
+        if [ $(echo $COMPREPLY | wc -w) -eq 0 ] 
+        then 
+            COMPREPLY=($(fgm ${2}* | xargs -n1 basename))
+        fi  
+        if [ $(echo $COMPREPLY | wc -w) -eq 0 ] 
+        then
+            COMPREPLY=($(fgm *${2}* | xargs -n1 basename))
+        fi  
+    fi  
+}
+
+###Edit Found Git Matches
+function efgm() {
+    local Hits
+    Hits=$(fgm "$1")
+    if [ $? -ne 0 ]
+    then
+        return 1
+    fi
+    if [ $( echo $Hits | wc -w ) -ne 1 ]
+    then
+        _error_echo "Wrong number of hits: $Hits"
+        return 1
+    else
+        vim $Hits
+    fi
+}
+complete -F _complete_for_fgm efgm
+
+###Grep All Code
+function gac() {
+    if [ $# -ne 0 ]
+    then
+        local GitRoot
+        GitRoot=$(_find_git_root)
+        if [ $? -ne 0 ]
+        then
+            return 1
+        fi
+        
+        grep --include=*.{json,html,sh,py,ini,base,config,java,js,go,toml,properties,template} -Inr $@ $GitRoot 
+    else
+        _error_echo "Not enough args"
+        return 1
+    fi
+}
+
+###Edit Grep All Code matches
+function egac() {
+    local AllMatches
+    AllMatches=$(gac -l $@)
+    if [ -z "$AllMatches" ]
+    then
+        _error_echo "No Matches!"
+        return 1
+    fi
+    vim +/$1 $AllMatches
+}
+
+###Edit Git Diff
+function egd() {
+    vim $(git status | grep modified | awk '{print $2}')
+}
+
+###Json DIFF
+function jdiff(){
+    if [ $# -ne 2 ]
+    then
+        _error_echo -e "\nInvalid number of arguments\n"
+        return 1
+    fi
+    local TempFileA
+    TempFileA="/tmp/a_$(basename $1).json"
+    local TempFileB
+    TempFileB="/tmp/b_$(basename $2).json"
+    jq . -S $1 > $TempFileA
+    jq . -S $2 > $TempFileB
+    diff $TempFileA $TempFileB
+    #opendiff $TempFileA $TempFileB
+}
+
+###update MOTTO
+function motto(){
+    if [ $# -ne 0 ]
+    then
+        echo "$@" > $MottoState
+    fi
+    Motto=$(cat $MottoState)
+    PS1="\[${MottoColor}\]${Motto}\[${NormalColor}\]:${ShaPS1}"
+}
+
+###Edit VIMRC
+alias evimrc='vim $HOME/.vimrc'
+
+###edit Sha VIMRC
+alias svimrc="vim ${StateDir}/vimrc"
+
+###Overwrite VIMRC
+function ovimrc() {
+    if [ -a $HOME/.vimrc ]
+    then
+        _error_echo vimrc exists save somewhere.
+        return 1
+    fi
+    echo overrwriting vimrc with sha_vimrc
+    cp ${StateDir}/vimrc $HOME/.vimrc
+}
+
+###Edit SSH config
+alias essh='vim $HOME/.ssh/config'
+
+###Copy TIME:
+function ctime(){
+    local DateDelim
+    local DateTimeDelim
+    local TimeDelim
+    TimeDelim=":"
+    DateTimeDelim=" "
+    DateDelim="-"
+    if [ $# -gt 0 ] 
+    then
+        DateDelim="$1"
+    fi  
+    date "+%Y${DateDelim}%m${DateDelim}%d${DateTimeDelim}%H${TimeDelim}%M" | tr -d '\n' | pbcopy
+}
+
+###Copy DATE:
+function cdate(){
+    local Delim
+    Delim="-"
+    if [ $# -gt 0 ] 
+    then
+        Delim="$1"
+    fi  
+    date "+%Y${Delim}%m${Delim}%d" | tr -d '\n' | pbcopy
+}
+
+###override CD 
+function cd(){
+    builtin cd "$@"
+    echo "1 $(pwd)" >> ${DirHeatMap}
+}
+
+function _crunch() {
+    awk '{map[$2]+=$1}END{for(dir in map)print map[dir] " " dir}'
+}
+
+###CLEAN HCD of missing files
+function clean_hcd() {
+    local TempMap
+    TempMap=/tmp/temp_$(basename $DirHeatMap)
+    cat $DirHeatMap | awk '{print "if [ -d "$2" ]; then echo "$1" "$2"; fi" }'| bash > $TempMap
+    cat $TempMap > $DirHeatMap
+    rm $TempMap
+}
+
+###Heat map CD
+function hcd(){
+    local SearchTerm
+    SearchTerm="$1"
+    local Count=1
+    local TargetDir
+    local TempMap
+    TempMap=/tmp/temp_$(basename $DirHeatMap)
+    cat $DirHeatMap | _crunch | sort -nk1 > $TempMap
+    cat $TempMap > $DirHeatMap
+    rm $TempMap
+    if [ $# -eq 0 ]
+    then
+        cat ${DirHeatMap}
+        return 0
+    fi
+    if [ $# -gt 1 ]
+    then
+        Count=$2
+    fi
+    TargetDir=$(cat ${DirHeatMap} | grep "$SearchTerm" | awk '{print $2}' | tail -$Count | head -1)
+    if [ -z $TargetDir ]
+    then
+        _error_echo "No Matches for $@"
+        return 1
+    fi
+    cd $TargetDir
+}
+
+###Set the motto if not already set:
+if [ -z "${Motto}" ]
+then
+    motto
+fi
+
