@@ -267,6 +267,12 @@ function hcd(){
     cd $TargetDir
 }
 
+###Create MottoState if it does not exist already
+if [ ! -f "${MottoState}" ]
+then
+    mkdir -p "${StateDir}"
+    echo "I would rather be a sunflower." > ${MottoState}
+fi
 ###Set the motto if not already set:
 if [ -z "${Motto}" ]
 then
