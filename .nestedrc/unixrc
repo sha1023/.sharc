@@ -28,7 +28,7 @@ export TERM="xterm-color"
 
 #My minimalistic version:
 export ShaPS1
-ShaPS1='\[\e[0;33m\]\[\e[0;34m\]\W\[\e[0m\]\$'
+ShaPS1='\[\e[0;33m\]\[\e[0;34m\]\W\[\e[0m\]\$ '
 
 #define motto state
 export MottoState
