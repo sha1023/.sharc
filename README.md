@@ -32,7 +32,7 @@ If you'd like to add some local aliases files that git won't nag you about, simp
 ### Gratuitous Functions:
 
 My favorite aliases included are:
-1) `hcd`: Heat map CD -- with no arguments it dumps out the visit counts to different directories. With one argument (`hcd regex`) it cds into the most visited directory which matches `regex`. With two arguments (`hcd regex n`) it cds into the nth most most visited entry that matches regex. WARNING this is accomplished by overloading the cd command to store directory changes to a state file. if that makes you uncomfortable (It probably should.), you can find the overloaded cd for inspection or removal using the command `esharc cd`. Alternatively, all the relevant hcd utilities are in `./sharc/hcd\_aliases` you can simply delte the file.
+1) `hcd`: Heat map CD -- with no arguments it dumps out the visit counts to different directories. With one argument (`hcd regex`) it cds into the most visited directory which matches `regex`. With two arguments (`hcd regex n`) it cds into the nth most most visited entry that matches regex. WARNING this is accomplished by overloading the cd command to store directory changes to a state file. if that makes you uncomfortable (It probably should.), you can find the overloaded cd for inspection or removal using the command `esharc cd`. Alternatively, all the relevant hcd utilities are in `./sharc/hcdrc` you can simply delte the file.
 2) `gac`: Grep All Code -- greps all code from the git root.
 3) `egac`: Edit Grep All Code matches -- edits any files revealed by gac
 4) `fgm`: Find Git Matches -- Finds files in your git directory that match the provided regex.
