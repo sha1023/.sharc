@@ -32,11 +32,19 @@ then
     ShaOS=darwin
 fi
 
-###Set Normal Color
+###set some useful variables
 export NormalColor
 NormalColor=$(tput sgr0)
 export AlertColor
 AlertColor=$(tput rev)
+
+export PrefixRegexForFunctions
+PrefixRegexForFunctions="^\s*function\s\+"
+export PrefixRegexForAliases
+PrefixRegexForAliases="^\s*alias\s\+"
+export PrefixRegexForComments
+PrefixRegexForComments="^\s*###"
+
 
 function _error_echo() {
     (>&2 echo -e "${AlertColor}$@${NormalColor}")
@@ -95,7 +103,7 @@ function esharc() {
         vim +:ls $SearchList
     else 
         local SearchTerm
-        SearchTerm="^function\s$1\|^alias\s$1\|^###\s*$1"
+        SearchTerm="${PrefixRegexForFunctions}$1\|${PrefixRegexForAliases}$1"
         local SearchResults
         SearchResults=$(grep -l $SearchTerm $SearchList)
         if [ -n "$SearchResults" ]
@@ -122,7 +130,7 @@ function grsharc() {
 function sharc() {
     local SearchTerm
     local SearchList
-    SearchTerm='^function\s[A-Za-z][^(]\+\|^alias\s[A-Za-z][^=]*\|^###.*$'
+    SearchTerm="${PrefixRegexForFunctions}[A-Za-z][^(]\+\|${PrefixRegexForAliases}[A-Za-z][^=]*\|${PrefixRegexForComments}.*$"
     SearchList=$(_get_all_aliases)
     grep -ho "$SearchTerm" $SearchList | sed 's/function/    /g' | sed 's/alias/    /g'
 }
