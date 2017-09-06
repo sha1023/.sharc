@@ -19,7 +19,7 @@ source $HOME/.sharc/.sharc
 
 This package is sort of self documenting the `sharc` command prints all comments that are prefixed by "###" and all aliases/functions not prefixed by "\_".
 
-I've included some of my favorite aliases, but the package is really just meant to allow meant to allow for easy modification and addition of aliases. There are also a few cute tools for editing particular commands on the fly:
+I've included some of my favorite aliases, but the package is really just meant to allow for easy modification and addition of aliases. There are also a few cute tools for editing particular commands on the fly:
 
 ### Essential Functions:
 
