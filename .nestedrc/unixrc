@@ -33,7 +33,6 @@ ShaPS1='\[\e[0;33m\]\[\e[0;34m\]\W\[\e[0m\]\$ '
 #define motto state
 export MottoState
 MottoState="${StateDir}/motto"
-export Motto
 
 ###cd TMP
 alias tmp='cd /tmp'
@@ -181,40 +180,13 @@ function ovimrc() {
 ###Edit SSH config
 alias essh='vim $HOME/.ssh/config'
 
-###Copy TIME:
-function ctime(){
-    local DateDelim
-    local DateTimeDelim
-    local TimeDelim
-    TimeDelim=":"
-    DateTimeDelim=" "
-    DateDelim="-"
-    if [ $# -gt 0 ] 
-    then
-        DateDelim="$1"
-    fi  
-    date "+%Y${DateDelim}%m${DateDelim}%d${DateTimeDelim}%H${TimeDelim}%M" | tr -d '\n' | pbcopy
-}
-
-###Copy DATE:
-function cdate(){
-    local Delim
-    Delim="-"
-    if [ $# -gt 0 ] 
-    then
-        Delim="$1"
-    fi  
-    date "+%Y${Delim}%m${Delim}%d" | tr -d '\n' | pbcopy
-}
-
 ###update MOTTO
 function motto(){
     if [ $# -ne 0 ]
     then
         echo "$@" > $MottoState
     fi
-    Motto=$(cat $MottoState)
-    PS1="\[${MottoColor}\]${Motto}\[${NormalColor}\]:${ShaPS1}"
+    PS1="\[${MottoColor}\]$(cat $MottoState)\[${NormalColor}\]:${ShaPS1}"
 }
 
 ###Create MottoState if it does not exist already
@@ -223,9 +195,5 @@ then
     mkdir -p "${StateDir}"
     echo "I would rather be a sunflower." > ${MottoState}
 fi
-###Set the motto if not already set:
-if [ -z "${Motto}" ]
-then
-    motto
-fi
 
+motto

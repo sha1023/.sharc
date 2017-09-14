@@ -22,3 +22,29 @@ function cgm() {
 }
 complete -F _complete_for_fgm cgm
 
+###Copy TIME:
+function ctime(){
+    local DateDelim
+    local DateTimeDelim
+    local TimeDelim
+    TimeDelim=":"
+    DateTimeDelim=" "
+    DateDelim="-"
+    if [ $# -gt 0 ] 
+    then
+        DateDelim="$1"
+    fi  
+    date "+%Y${DateDelim}%m${DateDelim}%d${DateTimeDelim}%H${TimeDelim}%M" | tr -d '\n' | pbcopy
+}
+
+###Copy DATE:
+function cdate(){
+    local Delim
+    Delim="-"
+    if [ $# -gt 0 ] 
+    then
+        Delim="$1"
+    fi  
+    date "+%Y${Delim}%m${Delim}%d" | tr -d '\n' | pbcopy
+}
+
