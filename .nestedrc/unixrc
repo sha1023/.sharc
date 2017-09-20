@@ -27,20 +27,18 @@ export LSCOLORS=GxFxCxDxBxegedabagaced
 export TERM="xterm-color"
 
 #My minimalistic version:
-export ShaPS1
 ShaPS1='\[\e[0;33m\]\[\e[0;34m\]\W\[\e[0m\]\$ '
 
 #define motto state
-export MottoState
-MottoState="${StateDir}/motto"
+ShaMottoState="${StateDir}/motto"
 
 ###cd TMP
 alias tmp='cd /tmp'
 
 #Trick for color label in this case (your personal motto):
-if [ -z $MottoColor ]
+if [ -z $ShaMottoColor ]
 then
-    export MottoColor=$(tput setaf 1) # Red
+    ShaMottoColor=$(tput setaf 1) # Red
 fi
 
 function _find_git_root(){
@@ -184,16 +182,16 @@ alias essh='vim $HOME/.ssh/config'
 function motto(){
     if [ $# -ne 0 ]
     then
-        echo "$@" > $MottoState
+        echo "$@" > $ShaMottoState
     fi
-    PS1="\[${MottoColor}\]$(cat $MottoState)\[${NormalColor}\]:${ShaPS1}"
+    PS1="\[${ShaMottoColor}\]$(cat $ShaMottoState)\[${NormalColor}\]:${ShaPS1}"
 }
 
-###Create MottoState if it does not exist already
-if [ ! -f "${MottoState}" ]
+###Create ShaMottoState if it does not exist already
+if [ ! -f "${ShaMottoState}" ]
 then
     mkdir -p "${StateDir}"
-    echo "I would rather be a sunflower." > ${MottoState}
+    echo "I would rather be a sunflower." > ${ShaMottoState}
 fi
 
 motto

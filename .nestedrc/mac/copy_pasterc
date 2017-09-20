@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 
-### ### MAC SPECIFIC UTILITIES ### ###
+### ### COPY PASTE SPECIFIC UTILITIES ### ###
 
-if [ "$ShaOS" != "darwin" ]
-then
-    _error_echo "Not sourcing mac aliases since $ShaOS != darwin."
-    return 0
-fi
+type pbpaste > /dev/null && type pbcopy > /dev/null || return 0
 
 ###Copy Git Match
 function cgm() {

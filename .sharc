@@ -4,9 +4,7 @@
 
 echo "sourcing ${BASH_SOURCE[0]}"
 
-export SharcDir
 SharcDir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-export SourceHierarchy
 if [ -z "$SourceHierarchy" ]
 then 
     for Source in ${BASH_SOURCE[@]}
@@ -15,36 +13,20 @@ then
     done
 fi
 
-export AliasDir
 AliasDir="$SharcDir/.nestedrc"
-export StateDir
 StateDir="$SharcDir/.state"
-export MainRC
 if [ -z "$MainRC" ]
 then
     MainRC=$(echo "$SourceHierarchy" | cut -d' ' -f 1) #~/.bashrc
 fi
 
-export ShaOS
-ShaOS=linux
-if [ $(echo $OSTYPE | grep "darwin.*" | wc -l) -eq 1 ]
-then
-    ShaOS=darwin
-fi
-
 ###set some useful variables
-export NormalColor
 NormalColor=$(tput sgr0)
-export AlertColor
 AlertColor=$(tput rev)
 
-export PrefixRegexForFunctions
 PrefixRegexForFunctions="^\s*function\s\+"
-export PrefixRegexForAliases
 PrefixRegexForAliases="^\s*alias\s\+"
-export PrefixRegexForComments
 PrefixRegexForComments="^\s*###"
-
 
 function _error_echo() {
     (>&2 echo -e "${AlertColor}$@${NormalColor}")
