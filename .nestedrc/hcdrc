@@ -6,7 +6,7 @@ DirHeatMap="${StateDir}/dir_heat_map"
 
 ###override CD 
 function cd(){
-    builtin cd "$@"
+    builtin cd "$@" &&
     echo "1 $(pwd)" >> ${DirHeatMap}
 }
 
